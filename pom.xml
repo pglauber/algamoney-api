@@ -45,6 +45,25 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<!-- mysql -->
+		<dependency>
+			<groupId>mysql</groupId>
+			<artifactId>mysql-connector-java</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+		
+		<!-- Migracoes - Flyway -->
+		<dependency>
+			<groupId>org.flywaydb</groupId>
+			<artifactId>flyway-core</artifactId>
+		</dependency>
+
+		<!-- A partir do Spring Boot 2.3 nós precisamos adicionar explicitamente -->
+		<dependency> 
+		  <groupId>org.springframework.boot</groupId> 
+		  <artifactId>spring-boot-starter-validation</artifactId> 
+		</dependency>
 	</dependencies>
 
 	<build>
