@@ -36,7 +36,7 @@ public class LancamentoResource {
 	}
 	
 	@GetMapping("/{codigo}")
-	public ResponseEntity<Lancamento>  listarPorCodigo(@PathVariable Long codigo) {
+	public ResponseEntity<Lancamento> listarPorCodigo(@PathVariable Long codigo) {
 		Optional<Lancamento> lancamentoSalvo = lancamentoRepository.findById(codigo);
 		if (lancamentoSalvo != null) {
 			return ResponseEntity.of(lancamentoSalvo);
