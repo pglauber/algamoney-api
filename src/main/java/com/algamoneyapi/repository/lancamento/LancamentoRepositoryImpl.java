@@ -18,6 +18,7 @@ import org.springframework.util.StringUtils;
 
 import com.algamoneyapi.model.Lancamento;
 import com.algamoneyapi.repository.filter.LancamentoFilter;
+import com.algamoneyapi.repository.projection.ResumoLancamento;
 
 public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery{
 
@@ -54,7 +55,7 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery{
 		return manager.createQuery(criteria).getSingleResult();
 	}
 
-	private void adicionarRestricoesPaginacao(TypedQuery<Lancamento> query, Pageable pageable) {
+	private void adicionarRestricoesPaginacao(TypedQuery</*Lancamento*/?> query, Pageable pageable) {
 		int paginaAtual = pageable.getPageNumber();
 		int totalRegistrosPorPagina = pageable.getPageSize();
 
@@ -64,6 +65,28 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery{
 		query.setMaxResults(totalRegistrosPorPagina);
 	}
 
+	@Override
+	public Page<ResumoLancamento> resumir(LancamentoFilter lancamentoFilter, Pageable pageable) {
+		CriteriaBuilder builder = manager.getCriteriaBuilder();
+		CriteriaQuery<ResumoLancamento> criteria = builder.createQuery(ResumoLancamento.class);
+		Root<Lancamento> root = criteria.from(Lancamento.class);
+		
+		criteria.select(builder.construct(ResumoLancamento.class, 
+				root.get("codigo"), root.get("descricao"),
+				root.get("dataVencimento"), root.get("dataPagamento"),
+				root.get("valor"), root.get("tipo"),
+				root.get("categoria").get("nome"), root.get("pessoa").get("nome")));
+		
+		Predicate[] predicates = criarRestricoes(lancamentoFilter, builder, root);
+		criteria.where(predicates);
+		
+		TypedQuery<ResumoLancamento> query = manager.createQuery(criteria);
+		
+		adicionarRestricoesPaginacao(query, pageable);
+		
+		return new PageImpl</*Lancamento*/>(query.getResultList(), pageable, total(lancamentoFilter));
+	}
+	
 	private Predicate[] criarRestricoes(LancamentoFilter lancamentoFilter, CriteriaBuilder builder, Root<Lancamento> root) {
 		List<Predicate> predicates = new ArrayList<Predicate>();
 		
@@ -84,5 +107,4 @@ public class LancamentoRepositoryImpl implements LancamentoRepositoryQuery{
 		
 		return predicates.toArray(new Predicate[predicates.size()]);
 	}
-
 }
